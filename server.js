@@ -5,11 +5,13 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const { check, validationResult } = require('express-validator');
+
+// initiate our app
 const app = express();
 
 // Configure session middleware
 app.use(session({
-    secret: 'secret-key',
+    secret: 'secret-key', // or 'bhbchnebeyycbcjeyhweoqihjbkjui'
     resave: false,
     saveUninitialized: true
 }));
@@ -19,7 +21,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'learning_management'
+    database: 'learning_management' //or 'plp_expense'
 });
 
 // Connect to MySQL
@@ -29,7 +31,12 @@ connection.connect((err) => {
         return;
     }
     console.log('Connected to MySQL as id ' + connection.threadId);
+    // connected successfully to the DB server.
 });
+
+//static
+
+
 
 // Set up middleware to parse incoming data
 app.use(express.json());
@@ -37,14 +44,18 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Define routes
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+// Define routes.. showing registration form
+app.get('/register', (req, res) => {
+    response.sendFile(__dirname + '/register.html');
 });
 
 
+app.listen(3000, () => {
+    console.log('server is running')
+});
+
   
-// Define a User representation for clarity
+// create a user object
 const User = {
     tableName: 'users', 
     createUser: function(newUser, callback) {
@@ -59,7 +70,7 @@ const User = {
 };
 
 // Registration route
-app.post('/register', [
+app.post('/plp/api/user/register', [
     // Validate email and username fields
     check('email').isEmail(),
     check('username').isAlphanumeric().withMessage('Username must be alphanumeric'),
@@ -96,13 +107,13 @@ app.post('/register', [
         full_name: req.body.full_name
     };
 
-    // Insert user into MySQL
+    // Insert user into MySQL or save the new user
     User.createUser(newUser, (error, results, fields) => {
         if (error) {
           console.error('Error inserting user: ' + error.message);
           return res.status(500).json({ error: error.message });
         }
-        console.log('Inserted a new user with id ' + results.insertId);
+        console.log('new user successfully created ' + results.insertId);
         res.status(201).json(newUser);
       });
 });
